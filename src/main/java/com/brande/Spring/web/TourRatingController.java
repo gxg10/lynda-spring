@@ -45,6 +45,53 @@ public class TourRatingController {
                 ratingDto.getScore(), ratingDto.getComment()));
     }
 
+    @RequestMapping(method = RequestMethod.GET)
+    public Page<RatingDto> getAllRatingsForTour(@PathVariable(value="tourId")int tourId,
+                                                Pageable pageable) {
+        verifyTour(tourId);
+        Page<TourRating> tourRatingPage = tourRatingRepository.findByPkTourId(tourId, pageable);
+        List<RatingDto> ratingDtoList = tourRatingPage.getContent().stream()
+                .map(tourRating -> toDto(tourRating)).collect(Collectors.toList());
+        return new PageImpl<RatingDto>(ratingDtoList, pageable
+        ,tourRatingPage.getTotalPages());
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "/average")
+    public AbstractMap.SimpleEntry<String, Double> getAverage(@PathVariable(value = "tourId") int tourId) {
+        verifyTour(tourId);
+        List<TourRating> tourRatings =  tourRatingRepository.findByPkTourId(tourId);
+        OptionalDouble average = tourRatings.stream().mapToInt(TourRating::getScore).average();
+        return new AbstractMap.SimpleEntry<String, Double>("average", average.isPresent()?average.getAsDouble()
+                :null);
+    }
+
+    @RequestMapping(method = RequestMethod.PUT)
+    public RatingDto updateWithPut(@PathVariable(value="tourId") int tourId, @RequestBody
+                                   @Validated RatingDto ratingDto) {
+        TourRating tourRating = verifyTourRating(tourId, ratingDto.getCustomerId());
+        tourRating.setScore(ratingDto.getScore());
+        tourRating.setComment(ratingDto.getComment());
+        return toDto(tourRatingRepository.save(tourRating));
+    }
+
+    @RequestMapping(method = RequestMethod.PATCH)
+    public RatingDto updateWithPatch(@PathVariable(value="tourId") int tourId, @RequestBody
+    @Validated RatingDto ratingDto) {
+        TourRating tourRating = verifyTourRating(tourId, ratingDto.getCustomerId());
+        if (ratingDto.getScore() != null) {
+            tourRating.setScore(ratingDto.getScore());
+        }
+        if (ratingDto.getComment() != null) {
+            tourRating.setComment(ratingDto.getComment());
+        }
+        return toDto(tourRatingRepository.save(tourRating));
+    }
+
+    public void delete(@PathVariable(value = "tourId") int tourId,
+                       @PathVariable(value="customerId") int customerId) {
+        TourRating tourRating = verifyTourRating(tourId, customerId);
+        tourRatingRepository.delete(tourRating);
+    }
 
     /**
      * Verify and return the Tour given a tourId.
@@ -72,5 +119,19 @@ public class TourRatingController {
     public String return400(NoSuchElementException ex) {
         return ex.getMessage();
 
+    }
+
+    private RatingDto toDto(TourRating tourRating) {
+        return new RatingDto(tourRating.getScore(), tourRating.getComment(), tourRating.getPk().getCustomerId());
+    }
+
+    private TourRating verifyTourRating(int tourId, int customerId) throws NoSuchElementException{
+        TourRating rating = tourRatingRepository.findByPkTourIdAndPkCustomerId(tourId, customerId);
+        if (rating == null) {
+            throw new NoSuchElementException("Tour- Rating pair for request("
+            + tourId
+             + " for customer" + customerId);
+        }
+        return rating;
     }
 }
