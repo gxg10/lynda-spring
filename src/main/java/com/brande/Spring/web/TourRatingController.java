@@ -35,7 +35,16 @@ public class TourRatingController {
     protected TourRatingController() {
 
     }
-    
+
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createTourRating(@PathVariable(value="tourId") int tourId,
+                                 @RequestBody @Validated RatingDto ratingDto) {
+        Tour tour = verifyTour(tourId);
+        tourRatingRepository.save(new TourRating(new TourRatingPk(tour, ratingDto.getCustomerId()),
+                ratingDto.getScore(), ratingDto.getComment()));
+    }
+
 
     /**
      * Verify and return the Tour given a tourId.
