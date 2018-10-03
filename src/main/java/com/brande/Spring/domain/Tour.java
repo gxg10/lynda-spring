@@ -2,10 +2,10 @@ package com.brande.Spring.domain;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
-public class Tour implements Serializable {
-
+public class Tour implements Serializable{
     @Id
     @GeneratedValue
     private Integer id;
@@ -31,6 +31,7 @@ public class Tour implements Serializable {
     @Column
     private String keywords;
 
+
     @ManyToOne
     private TourPackage tourPackage;
 
@@ -40,8 +41,8 @@ public class Tour implements Serializable {
     @Column
     private Region region;
 
-    public Tour(String title, String description, String blurb, Integer price, String duration,
-                String bullets, String keywords, TourPackage tourPackage, Difficulty difficulty, Region region) {
+    public Tour(String title, String description, String blurb, Integer price, String duration, String bullets,
+                String keywords, TourPackage tourPackage, Difficulty difficulty, Region region) {
         this.title = title;
         this.description = description;
         this.blurb = blurb;
@@ -55,15 +56,10 @@ public class Tour implements Serializable {
     }
 
     protected Tour() {
-
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -118,16 +114,16 @@ public class Tour implements Serializable {
         return keywords;
     }
 
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
-    }
-
     public TourPackage getTourPackage() {
         return tourPackage;
     }
 
     public void setTourPackage(TourPackage tourPackage) {
         this.tourPackage = tourPackage;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public Difficulty getDifficulty() {
@@ -144,5 +140,45 @@ public class Tour implements Serializable {
 
     public void setRegion(Region region) {
         this.region = region;
+    }
+
+    @Override
+    public String toString() {
+        return "Tour{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", blurb='" + blurb + '\'' +
+                ", price=" + price +
+                ", duration='" + duration + '\'' +
+                ", bullets='" + bullets + '\'' +
+                ", keywords='" + keywords + '\'' +
+                ", tourPackage=" + tourPackage +
+                ", difficulty=" + difficulty +
+                ", region=" + region +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tour tour = (Tour) o;
+        return Objects.equals(id, tour.id) &&
+                Objects.equals(title, tour.title) &&
+                Objects.equals(description, tour.description) &&
+                Objects.equals(blurb, tour.blurb) &&
+                Objects.equals(price, tour.price) &&
+                Objects.equals(duration, tour.duration) &&
+                Objects.equals(bullets, tour.bullets) &&
+                Objects.equals(keywords, tour.keywords) &&
+                Objects.equals(tourPackage, tour.tourPackage) &&
+                difficulty == tour.difficulty &&
+                region == tour.region;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, description, blurb, price, duration, bullets, keywords, tourPackage, difficulty, region);
     }
 }
