@@ -16,11 +16,11 @@ public interface TourPackageRepository extends CrudRepository<TourPackage, Strin
 
     @Override
     @RestResource(exported = false)
-    <S extends TourPackage> Iterable<S> save(Iterable<S> iterable);
+    <S extends TourPackage> Iterable<S> saveAll(Iterable<S> iterable);
 
     @Override
     @RestResource(exported = false)
-    void delete(String s);
+    void deleteById(String s);
 
     @Override
     @RestResource(exported = false)
@@ -28,7 +28,7 @@ public interface TourPackageRepository extends CrudRepository<TourPackage, Strin
 
     @Override
     @RestResource(exported = false)
-    void delete(Iterable<? extends TourPackage> iterable);
+    void deleteAll(Iterable<? extends TourPackage> iterable);
 
     @Override
     @RestResource(exported = false)
